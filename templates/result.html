@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+
+
+
+    <title>預測結果</title>
+    <style>
+         /* Reset 預設樣式 */
+         * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+         /* 背景和整體樣式 */
+         body {
+            font-family: 'Quicksand', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f0f4f8;
+            padding: 20px;
+        }
+
+        /* 容器樣式 */
+        .container {
+            text-align: center;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        /* 標題樣式 */
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        /* 圖片樣式 */
+        #result-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+         /* 預測結果樣式 */
+        .prediction {
+            font-size: 20px;
+            color: #007bff;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+         /* 症狀資訊樣式 */
+         .symptom-info {
+            text-align: left;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .symptom-info h2 {
+            font-size: 20px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .symptom-info p {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        /* 返回按鈕樣式 */
+        .back-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>預測結果</h1>
+    <img id="result-image" src="" alt="上傳的圖片">
+    <div class="prediction" id="prediction-result"></div>
+
+<div id="symptom-info" class="symptom-info" style="display: none; margin-top: 20px;">
+    <h2>症狀詳情</h2>
+    <p id="cause"></p>
+    <p id="treatment"></p>
+    <p id="department"></p>
+</div>
+
+    <a href="/" class="back-button">返回上傳頁面</a>
+</div>
+
+<script>
+    // 從 sessionStorage 中取得圖片和預測結果
+    const imageSrc = sessionStorage.getItem('uploadedImage');
+    const prediction = sessionStorage.getItem('prediction');
+
+    // 定義症狀資訊
+    const symptomDetails = {
+        '黑色素細胞痣': {
+            cause: '黑色素細胞痣由黑色素細胞過度聚集引起，可能與遺傳和陽光曝曬有關。',
+            treatment: '觀察和定期檢查痣的變化，如有異常建議活檢檢查。',
+            department: '建議看診科別：皮膚科'
+        },
+        '黑色素瘤': {
+            cause: '黑色素瘤是一種高度惡性的皮膚癌，通常與長時間紫外線曝曬和遺傳有關。',
+            treatment: '早期發現可手術切除，晚期可能需放療、化療或免疫療法。',
+            department: '建議看診科別：皮膚科、腫瘤科'
+        },
+        '良性角化樣病變': {
+            cause: '良性角化樣病變常因老化、日曬和遺傳因素引起。',
+            treatment: '若影響美觀可冷凍或激光去除，通常不需治療。',
+            department: '建議看診科別：皮膚科'
+        },
+        '基底細胞癌': {
+            cause: '基底細胞癌是因皮膚基底細胞癌變引起，主要由長期紫外線曝曬所致。',
+            treatment: '主要治療方法是手術切除，或冷凍治療、局部放療。',
+            department: '建議看診科別：皮膚科、腫瘤科'
+        },
+        '化膿性肉芽腫和出血': {
+            cause: '血管性病變，可能由外傷、感染或荷爾蒙變化引發，常見於青少年和孕婦。',
+            treatment: '可選擇手術切除、電燒或激光治療。',
+            department: '建議看診科別：皮膚科、血管外科'
+        },
+        '日光性角化症和上皮內癌': {
+            cause: '由長期紫外線照射引起，是皮膚癌的前兆病變。',
+            treatment: '早期可冷凍治療、光動力療法，或局部藥物治療。',
+            department: '建議看診科別：皮膚科、腫瘤科'
+        },
+        '皮膚纖維瘤': {
+            cause: '皮膚纖維瘤由結締組織增生引起，通常是良性腫瘤，與皮膚創傷有關。',
+            treatment: '一般不需治療，若有困擾可手術切除。',
+            department: '建議看診科別：皮膚科'
+        }
+    };
+
+    // 檢查圖片和預測結果是否存在
+    if (imageSrc && prediction) {
+        // 顯示圖片和預測結果
+        document.getElementById('result-image').src = imageSrc;
+        document.getElementById('prediction-result').innerText = `預測結果: ${prediction}`;
+        // 顯示症狀資訊
+        const info = symptomDetails[prediction];
+        document.getElementById('cause').innerText = `引發原因：${info.cause}`;
+        document.getElementById('treatment').innerText = `建議診療方法：${info.treatment}`;
+        document.getElementById('department').innerText = info.department;
+        document.getElementById('symptom-info').style.display = 'block';
+    } else {
+        // 如果資料不存在，返回上傳頁面
+        window.location.href = 'test.html';
+    }
+
+    // 顯示圖片和預測結果
+    document.getElementById('result-image').src = imageSrc;
+    document.getElementById('prediction-result').innerText = `預測結果: ${prediction}`;
+</script>
+
+</body>
+</html>

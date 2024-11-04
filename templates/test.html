@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>症狀判斷與圖片上傳</title>
+    <style>
+        /* 現有樣式 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .top-images {
+            display: flex;
+            justify-content: center;
+            background-color: gray;
+            padding: 10px;
+        }
+        .top-images img {
+            margin: 0 10px;
+            height: 50px;
+            transition: transform 0.3s;
+        }
+        .main-photo {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ddd;
+        }
+        .side-menu {
+            position: fixed;
+            left: -200px;
+            top: 0;
+            width: 200px;
+            height: 100%;
+            background-color: #333;
+            transition: left 0.3s;
+            padding-top: 60px;
+            box-sizing: border-box;
+        }
+        .side-menu a {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+        }
+        .side-menu a:hover {
+            background-color: #575757;
+        }
+        .menu-toggle {
+            position: fixed;
+            top: 18px;
+            left: 18px;
+            font-size: 24px;
+            background-color: #333;
+            color: white;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        .menu-open .side-menu { left: 0; }
+        .footer {
+            background-color: #000;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        /* 上傳圖片彈窗 */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .overlay.active { display: flex; }
+        .upload-box {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            overflow: hidden;
+            display: flex; /* 設置為 flex 布局 */
+            justify-content: center; /* 水平置中 */
+            align-items: center; /* 垂直置中 */
+            flex-direction: column; /* 讓內容垂直排列 */
+        }
+        #preview {
+            max-width: 100%; /* 限制圖片寬度 */
+            max-height: 300px; /* 設定一個最大高度 */
+            object-fit: contain; /* 確保圖片適應框架大小且不失真 */
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+        .upload-box input[type="file"] { display: none; }
+        .upload-box label {
+            display: block;
+            padding: 50px;
+            border: 2px dashed #007bff;
+            border-radius: 10px;
+            cursor: pointer;
+            color: #007bff;
+            font-size: 18px;
+        }
+        .confirm-upload {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            opacity: 0.5;
+        }
+        .confirm-upload.enabled { opacity: 1; cursor: pointer; }
+        
+        .return-button {
+            /* display: none; */
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #uploaded-image {
+            max-width: 100%; /* 保持圖片在結果區域內 */
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+
+
+        .full-width-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="menu-toggle">☰</div>
+    <div class="side-menu">
+        <a href="#" id="symptom-link">症狀判斷</a>
+        <a href="mailto:s1100387@pu.edu.tw @gmail.com">聯絡資訊</a>
+    </div>
+    <div class="top-images">
+        <img src="logo.jpg" alt="小圖片" class="full-width-image">
+    </div>
+    <div class="main-photo">
+        <img src="logo2.jpg" alt="主題照片">
+    </div>
+    <div class="footer">
+        來源與資訊 | 版權所有 © 2024
+    </div>
+
+    <!-- 上傳圖片彈窗 -->
+    <div class="overlay" id="upload-overlay">
+        <div class="upload-box">
+            <h2>上傳圖片</h2>
+            <form id="upload-form">
+                <input type="file" id="file-input" accept="image/*">
+                <label for="file-input">點擊這裡上傳圖片</label>
+            </form>
+            <img id="preview" src="#" alt="預覽圖片" style="display:none;">
+            <button id="confirm-upload" class="confirm-upload" disabled>確定上傳</button>
+            <button id="return-button" class="return-button">返回</button>
+            <div id="result">
+                <img id="uploaded-image" src="#" alt="上傳的圖片" style="display:none; max-width: 100%; margin-top: 20px;">
+                <div id="prediction-result" style="font-size: 18px; margin-top: 10px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const menuToggle = document.querySelector('.menu-toggle');
+        const body = document.body;
+        menuToggle.addEventListener('click', () => {
+            body.classList.toggle('menu-open');
+        });
+
+        // 症狀判斷按鈕與彈窗控制
+        document.getElementById('symptom-link').onclick = function() {
+            document.getElementById('upload-overlay').classList.add('active');
+        };
+
+        // 圖片上傳功能
+        document.getElementById('file-input').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const preview = document.getElementById('preview');
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+
+                document.getElementById('upload-form').style.display = 'none';
+                const confirmButton = document.getElementById('confirm-upload');
+                confirmButton.disabled = false;
+                confirmButton.classList.add('enabled');
+            };
+
+            reader.readAsDataURL(file);
+        });
+
+        document.getElementById('confirm-upload').addEventListener('click', function() {
+            const fileInput = document.getElementById('file-input');
+            const file = fileInput.files[0];
+            if (file) {
+                const formData = new FormData();
+                formData.append('image', file);
+
+                fetch('http://127.0.0.1:5000/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => 
+                {
+                    if (data.error) {
+                        alert(`錯誤：${data.error}`);
+                    } else {
+                        // 使用 FileReader 讀取上傳圖片
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const imageSrc = e.target.result;
+                            const prediction = data.prediction;
+                            
+                            // 儲存圖片和預測結果到 sessionStorage
+                            sessionStorage.setItem('uploadedImage', imageSrc);
+                            sessionStorage.setItem('prediction', prediction);
+                            
+                            // 跳轉到 result.html 並傳遞圖片和預測結果
+                            window.location.href = '/result';
+                    };
+                    //  // 顯示上傳的圖片
+                    // const reader = new FileReader();
+                    // reader.onload = function(e) {
+                    //     uploadedImage.src = e.target.result;
+                    //     uploadedImage.style.display = 'block';
+                    // };
+                    reader.readAsDataURL(file);
+                }
+                    // 顯示 "返回" 按鈕
+                    document.getElementById('return-button').style.display = 'inline-block';
+                })
+                .catch(error => {
+                    document.getElementById('result').innerText = `上傳失敗，請重試。錯誤訊息: ${error}`;
+                });
+            }
+        });
+
+        // 添加点击图片重新上传的功能
+        document.getElementById('preview').addEventListener('click', function() 
+        {
+        document.getElementById('file-input').click();
+        });
+
+        // 返回按鈕點擊事件
+        document.getElementById('return-button').addEventListener('click', function() {
+            document.getElementById('upload-overlay').classList.remove('active');
+            document.getElementById('preview').style.display = 'none';
+            document.getElementById('result').innerText = '';
+            document.getElementById('upload-form').style.display = 'block';
+            document.getElementById('confirm-upload').disabled = true;
+            document.getElementById('confirm-upload').classList.remove('enabled');
+            // document.getElementById('return-button').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
