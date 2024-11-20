@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>症狀判斷與圖片上傳</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+        <!-- Bootstrap ICON -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         /* 現有樣式 */
         body {
@@ -20,17 +23,17 @@
             background-color: gray;
             padding: 10px;
         }
-        .top-images img {
+        /* .top-images img {
             margin: 0 10px;
             height: 50px;
             transition: transform 0.3s;
-        }
+        } */
         .main-photo {
             flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #ddd;
+            /* background-color: #ddd; */
         }
         .side-menu {
             position: fixed;
@@ -146,29 +149,74 @@
         }
 
 
-        .full-width-image {
+        /* .full-width-image {
             width: 100%;
             height: 100%;
             object-fit: cover;
-        }
+        } */
     </style>
 </head>
 <body>
-
-    <div class="menu-toggle">☰</div>
+    <div style="height: 2000px;">
+        <nav class="navbar navbar-expand-md navbar-light bg-light text-center">
+            <div class="container-fluid " style="background-color:rgb(147, 201, 240); margin-top: 0px;">
+            <a class="navbar-brand" href="/test" style="">
+                <img src="static/brandlogo.jpg" alt="" width="60" height="60">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item" style="font-size: 30px;">
+                        <a class="nav-link active" aria-current="page" href="#">首頁</a>
+                    </li>
+                    <li class="nav-item" style="font-size: 30px;">
+                        <a class="nav-link" href="#" id="symptom-link">症狀判斷</a>
+                    </li>
+                    <li class="nav-item" style="font-size: 30px;">
+                        <a class="nav-link" href="mailto:s1100387@pu.edu.tw @gmail.com">聯絡資訊</a>
+                    </li>
+                </ul>
+            </div>
+            </div>
+        </nav>
+    </div>
+    <!-- <div class="menu-toggle">☰</div>
     <div class="side-menu">
         <a href="#" id="symptom-link">症狀判斷</a>
         <a href="mailto:s1100387@pu.edu.tw @gmail.com">聯絡資訊</a>
-    </div>
-    <div class="top-images">
+    </div> -->
+    <!-- <div class="top-images">
         <img src="logo.jpg" alt="小圖片" class="full-width-image">
     </div>
     <div class="main-photo">
         <img src="logo2.jpg" alt="主題照片">
+    </div> -->
+    <div class="container">
+        <div class="content">
+            <div class="row">
+                <div class="col-md-12">
+                    <figure class="figure">
+                        <img src="static/logo.jpg" class="figure-img img-fluid rounded bg-light" alt="" >
+                        <figcaption class="figure-caption">A caption for the above image.</figcaption>
+                      </figure>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="footer">
-        來源與資訊 | 版權所有 © 2024
+    
+
+
+    <div style="background-color:rgb(147, 201, 240); color:#fff">
+        <div class="container">
+            <div class="footer" style="background:none; font-size: 25px;">
+                來源與資訊 | 版權所有 © 2024
+            </div>
+        </div>
     </div>
+
 
     <!-- 上傳圖片彈窗 -->
     <div class="overlay" id="upload-overlay">
@@ -189,11 +237,11 @@
     </div>
 
     <script>
-        const menuToggle = document.querySelector('.menu-toggle');
-        const body = document.body;
-        menuToggle.addEventListener('click', () => {
-            body.classList.toggle('menu-open');
-        });
+        // const navitem = document.querySelector('.nav-item');
+        // const body = document.body;
+        // nav-item.addEventListener('click', () => {
+        //     body.classList.toggle('menu-open');
+        // });
 
         // 症狀判斷按鈕與彈窗控制
         document.getElementById('symptom-link').onclick = function() {
@@ -281,7 +329,9 @@
             document.getElementById('confirm-upload').disabled = true;
             document.getElementById('confirm-upload').classList.remove('enabled');
             // document.getElementById('return-button').style.display = 'none';
-        });
+        });     
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin='anonymous'>
     </script>
 </body>
 </html>
